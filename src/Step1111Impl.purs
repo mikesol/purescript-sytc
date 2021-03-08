@@ -1,11 +1,12 @@
 module Step1111Impl where
 
 import Prelude
-import Data.Tuple (fst)
-import Data.Tuple.Nested ((/\), type (/\))
+
+import Data.Newtype (class Newtype)
+import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Step1Lib (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union)
+import Step1Lib (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get, uncons)
 import Type.Proxy (Proxy(..))
 
 data Peano
@@ -17,12 +18,7 @@ foreign import data Succ :: Peano -> Peano
 newtype ShowMe a
   = ShowMe (a -> String)
 
-shower :: forall x head tail row. Cons x ShowMe head tail row => Typeclass row -> x -> String
-shower row x =
-  let
-    (ShowMe f) = fst (uncons (Proxy :: Proxy x) row)
-  in
-    f x
+derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 class ShowPeano (p :: Peano) where
   showPeano :: Proxy p -> String
@@ -42,7 +38,20 @@ instance showPeanoAltZ :: ShowPeanoAlt Z where
 instance showPeanoAltSucc :: ShowPeanoAlt x => ShowPeanoAlt (Succ x) where
   showPeanoAlt _ = "succ ( " <> (showPeanoAlt (Proxy :: Proxy x)) <> ")"
 
-myShows :: forall (p :: Peano). ShowPeano p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+class AsPeano :: forall k. k -> Peano -> Constraint
+class AsPeano x (y :: Peano) | x -> y where
+  asPeano :: Proxy x -> Proxy y
+
+instance asPeanoSucc :: AsPeano (Proxy (Succ x)) (Succ x) where
+  asPeano _ = Proxy :: Proxy (Succ x)
+else instance asPeanoZ :: AsPeano (Proxy Z) Z where
+  asPeano _ = Proxy :: Proxy Z
+else instance asPeanoX :: AsPeano x Z where
+  asPeano _ = Proxy :: Proxy Z
+
+type MyShows (p :: Peano) = ShowPeano p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+
+myShows :: forall (p :: Peano). MyShows p
 myShows _ =
   cons
     (Proxy :: Proxy (Proxy p))
@@ -50,38 +59,27 @@ myShows _ =
     empty
     (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
 
-yourShows :: forall (p :: Peano). ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+type YourShows (p :: Peano) = ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+
+yourShows :: forall (p :: Peano). YourShows p
 yourShows _ =
   let
     _ /\ _ /\ t = uncons (Proxy :: Proxy (Proxy p)) (myShows (Proxy :: Proxy p))
   in
     cons (Proxy :: Proxy (Proxy p)) (ShowMe showPeanoAlt) empty t
 
-class AsPeano x (y :: Peano) | x -> y where
-  asPeano :: Proxy x -> Proxy y
-
-instance asPeanoSucc :: AsPeano (Succ x) (Succ x) where
-  asPeano = identity
-else instance asPeanoZ :: AsPeano Z Z where
-  asPeano = identity
-else instance asPeanoX :: AsPeano x Z where
-  asPeano _ = Proxy :: Proxy Z
-
 myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')) => x -> String
-myShow x = shower ((myShows :: Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))) (asPeano (Proxy :: Proxy x))) x
+myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))
 
-{-
-class MyShow x where
-  myShow :: x -> String
+yourShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => ShowPeanoAlt p => Cons x ShowMe head tail (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')) => x -> String
+yourShow = get (Proxy :: Proxy ShowMe) ((yourShows :: YourShows p) (asPeano (Proxy :: Proxy x)))
 
-instance myShowP :: (ShowPeano p, Cons (Proxy p) ShowMe head tail (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))) => MyShow (Proxy p) where
-  myShow x = shower (myShows x) x
-else instance myShowA :: Cons x ShowMe head tail (TypeclassCons' (Proxy Z) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')) => MyShow x where
-  myShow x = shower (myShows (Proxy :: Proxy Z)) x
--}
-step111 :: Effect Unit
-step111 = do
+step1111 :: Effect Unit
+step1111 = do
   log $ myShow true
   log $ myShow (Proxy :: Proxy Z)
-  --log $ myShow (Proxy :: Proxy (Succ Z))
+  log $ myShow (Proxy :: Proxy (Succ Z))
+  log $ yourShow true
+  log $ yourShow (Proxy :: Proxy Z)
+  log $ yourShow (Proxy :: Proxy (Succ Z))
   pure unit

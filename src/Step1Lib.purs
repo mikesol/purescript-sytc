@@ -13,14 +13,17 @@ module Step1Lib
   , negCons
   , class Union
   , union
+  , get
   ) where
 
 import Prelude
 
 import Data.List (List(..), (:))
+import Data.Newtype (class Newtype, unwrap)
+import Data.Tuple (fst)
 import Data.Tuple.Nested ((/\), type (/\))
 import Partial.Unsafe (unsafeCrashWith)
-import Type.Proxy (Proxy)
+import Type.Proxy (Proxy(..))
 import Unsafe.Coerce (unsafeCoerce)
 
 data Typeclass'
@@ -81,3 +84,5 @@ instance unionTypeclassNil' :: HomogeneousOp x => Union TypeclassNil' x x where
 instance unionTypeclassCons' :: (HomogeneousOp a, HomogeneousOp b, HomogeneousOp o,  Union a b o) => Union (TypeclassCons' k v a) b (TypeclassCons' k v o) where
   union (Typeclass a) (Typeclass b) = Typeclass (a <> b)
 
+get :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail row => Proxy f -> Typeclass row -> f'
+get _ row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
