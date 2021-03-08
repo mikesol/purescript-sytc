@@ -27,7 +27,7 @@ prog = do
 
 # Extensible type classes
 
-Type classes can't be modified once they're created. That means that, once `Show Unit` has been defined, we need to define a new type class if we want to override `Show Unit`. In most cases this is fine, but in some cases it won't work:
+Type class instances can't be modified once they're created. That means that, once `Show Unit` has been defined, we need to define a new type class if we want to override `Show Unit`. In most cases this is fine, but in some cases it won't work:
 
 1. We can't create [orphaned instances](https://github.com/purescript/documentation/blob/master/errors/OrphanInstance.md).
 1. We can't use information about type classes to determine the flow of a program. For example, we can't count how many instances they have, determine if they have instances of the same type, etc.
