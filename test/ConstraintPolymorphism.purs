@@ -8,7 +8,7 @@ import Data.Typeclass
   , Typeclass
   , TypeclassCons'
   , TypeclassNil'
-  , cons
+  , conz
   , empty
   , get
   )
@@ -38,10 +38,10 @@ myShows ::
   forall a.
   HomogeneousOp' ShowMe a =>
   Typeclass a -> MyShows a
-myShows a = cons (ShowMe $ (show :: Int -> String)) empty a
+myShows a = conz (ShowMe $ (show :: Int -> String)) a
 
 extension :: Typeclass (TypeclassCons' Boolean ShowMe TypeclassNil')
-extension = (cons (ShowMe $ (show :: Boolean -> String)) empty empty)
+extension = (conz (ShowMe $ (show :: Boolean -> String)) empty)
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
