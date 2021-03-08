@@ -28,14 +28,13 @@ type MyShows a
 myShows :: forall a. MyShows a
 myShows _ =
   cons
-    (Proxy :: Proxy (Maybe Int))
-    (ShowMe $ const "Everyone loves a Maybe Int!")
+    (ShowMe $ \(_ :: Maybe Int) -> "Everyone loves a Maybe Int!")
     empty
-    ( cons (Proxy :: Proxy a)
-        (ShowMe $ show)
+    ( cons
+        (ShowMe $ (show :: a -> String))
         empty
-        ( cons (Proxy :: Proxy Boolean)
-            (ShowMe $ show)
+        ( cons
+            (ShowMe $ (show :: Boolean -> String))
             empty
             empty
         )

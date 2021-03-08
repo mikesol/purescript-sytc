@@ -40,7 +40,7 @@ instance monoidTypeclassNil' :: Monoid (Typeclass TypeclassNil') where
 empty :: Typeclass TypeclassNil'
 empty = mempty
 
-newtype Typeclass (c :: Typeclass') = Typeclass (List (Void /\ Void))
+newtype Typeclass (c :: Typeclass') = Typeclass (List Void)
 
 class HomogeneousOp' :: (Type -> Type) -> Typeclass' -> Constraint
 class HomogeneousOp' op row
@@ -59,7 +59,7 @@ class NegCons label func head tail row | label row head -> func tail, label row 
   negCons :: Proxy label -> Typeclass row -> func label /\ Typeclass head /\ Typeclass tail
 
 instance negConsCacheHit :: NegCons l f TypeclassNil' c (TypeclassCons' l f c) where
-  negCons _ (Typeclass ((_ /\ a) : b)) = unsafeCoerce a /\ Typeclass Nil /\ Typeclass b
+  negCons _ (Typeclass (a : b)) = unsafeCoerce a /\ Typeclass Nil /\ Typeclass b
   negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
 else instance negConsCacheMiss :: NegCons l f notC x c => NegCons l f (TypeclassCons' notL f notC) x (TypeclassCons' notL f c) where
   negCons l (Typeclass (a : b)) = let x /\ (Typeclass y) /\ rest = (negCons :: Proxy l -> Typeclass c -> f l /\ Typeclass notC /\ Typeclass x) l (Typeclass b) in x /\ (Typeclass (a : y)) /\ rest
@@ -67,11 +67,11 @@ else instance negConsCacheMiss :: NegCons l f notC x c => NegCons l f (Typeclass
 
 class Cons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Typeclass' -> Constraint
 class Cons label func head tail row | label func head tail -> row, label row -> func head tail where
-  cons :: Proxy label -> func label -> Typeclass head -> Typeclass tail -> Typeclass row
+  cons :: func label -> Typeclass head -> Typeclass tail -> Typeclass row
   uncons :: Proxy label -> Typeclass row -> func label /\ Typeclass head /\ Typeclass tail
 
 instance consTypeclassCons' :: (HomogeneousOp row, NegCons label func head tail row) => Cons label func head tail row where
-  cons k v (Typeclass h) (Typeclass t) = Typeclass (h <> (pure $ (unsafeCoerce k) /\ (unsafeCoerce v)) <> t)
+  cons v (Typeclass h) (Typeclass t) = Typeclass (h <> (pure $ (unsafeCoerce v)) <> t)
   uncons = negCons
 
 class Union :: Typeclass' -> Typeclass' -> Typeclass' -> Constraint

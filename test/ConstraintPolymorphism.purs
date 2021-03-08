@@ -38,10 +38,10 @@ myShows ::
   forall a.
   HomogeneousOp' ShowMe a =>
   Typeclass a -> MyShows a
-myShows a = cons (Proxy :: Proxy Int) (ShowMe $ show) empty a
+myShows a = cons (ShowMe $ (show :: Int -> String)) empty a
 
 extension :: Typeclass (TypeclassCons' Boolean ShowMe TypeclassNil')
-extension = (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
+extension = (cons (ShowMe $ (show :: Boolean -> String)) empty empty)
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do

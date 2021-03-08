@@ -56,10 +56,9 @@ type MyShows (p :: Peano) = ShowPeano p => Proxy p -> Typeclass (BaseShow p)
 myShows :: forall (p :: Peano). MyShows p
 myShows _ =
   cons
-    (Proxy :: Proxy (Proxy p))
-    (ShowMe showPeano)
+    (ShowMe (showPeano :: Proxy p -> String))
     empty
-    (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
+    (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty empty)
 
 type YourShows (p :: Peano) = ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
 
@@ -68,7 +67,7 @@ yourShows _ =
   let
     _ /\ _ /\ t = uncons (Proxy :: Proxy (Proxy p)) (myShows (Proxy :: Proxy p))
   in
-    cons (Proxy :: Proxy (Proxy p)) (ShowMe showPeanoAlt) empty t
+    cons (ShowMe (showPeanoAlt :: Proxy p -> String)) empty t
 
 myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (BaseShow p) => x -> String
 myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))

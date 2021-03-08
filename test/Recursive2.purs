@@ -25,18 +25,16 @@ myShow x = get (Proxy :: Proxy ShowMe) (myShows unit) x
 myShows :: Unit -> MyShows
 myShows _ =
   cons
-    (Proxy :: Proxy (Maybe Int))
     ( ShowMe
         ( maybe "Nothing"
             (append "One less than Maybe " <<< myShow <<< (_ + 1))
         )
     )
     empty
-    ( cons (Proxy :: Proxy Int)
-        (ShowMe $ show)
+    ( cons (ShowMe $ (show :: Int -> String))
         empty
-        ( cons (Proxy :: Proxy Boolean)
-            (ShowMe $ show)
+        ( cons
+            (ShowMe $ (show :: Boolean -> String))
             empty
             empty
         )

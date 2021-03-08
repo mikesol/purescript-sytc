@@ -70,10 +70,10 @@ type MyShows
 
 myShows :: Typeclass MyShows
 myShows =
-  cons (Proxy :: Proxy Int)
-    (ShowMe $ show)
+  cons
+    (ShowMe $ (show :: Int -> String))
     empty
-    (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
+    (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty empty)
 
 myShow ::
   forall x head tail.
@@ -82,10 +82,10 @@ myShow = get (Proxy :: Proxy ShowMe) myShows
 
 yourShows :: Typeclass MyShows
 yourShows =
-  cons (Proxy :: Proxy Int)
-    (ShowMe $ const "Fooled you with a fake integer!")
+  cons
+    (ShowMe $ \(_ :: Int) -> "Fooled you with a fake integer!")
     empty
-    (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
+    (cons (ShowMe $ (show :: Boolean -> String)) empty empty)
 
 yourShow ::
   forall x head tail.
@@ -189,10 +189,10 @@ myShows ::
   forall a.
   HomogeneousOp' ShowMe a =>
   Typeclass a -> MyShows a
-myShows a = cons (Proxy :: Proxy Int) (ShowMe $ show) empty a
+myShows a = cons (ShowMe $ (show :: Int -> String)) empty a
 
 extension :: Typeclass (TypeclassCons' Boolean ShowMe TypeclassNil')
-extension = (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
+extension = (cons (ShowMe $ (show :: Boolean -> String)) empty empty)
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
