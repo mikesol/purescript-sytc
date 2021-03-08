@@ -199,3 +199,7 @@ constraintPolymorphism = do
   log $ myShow extension true
   log $ myShow empty 1
 ```
+
+# More examples
+
+More examples can be found in the [tests](./test).
