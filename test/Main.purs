@@ -1,11 +1,20 @@
 module Test.Main where
 
 import Prelude
-
+import Basic (basic)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import Recursive1 (recursive1)
+import Recursive2 (recursive2)
+import ShowOverride (showOverride)
 
 main :: Effect Unit
 main = do
-  log "🍝"
-  log "You should add some tests."
+  log "**** basic "
+  basic
+  log "**** showOverride "
+  showOverride
+  log "**** recursive1 "
+  recursive1
+  log "**** recursive2 "
+  recursive2

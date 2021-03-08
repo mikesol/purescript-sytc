@@ -1,10 +1,10 @@
-module Step1Impl where
+module Basic where
 
 import Prelude
 import Data.Tuple (fst)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Step1Lib (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union)
+import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union)
 import Type.Proxy (Proxy(..))
 import Data.Tuple.Nested ((/\))
 
@@ -57,8 +57,8 @@ niceShows =
 niceShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
 niceShow = shower niceShows
 
-step1 :: Effect Unit
-step1 = do
+basic :: Effect Unit
+basic = do
   log $ myShow true
   log $ myShow 1
   log $ yourShow true

@@ -1,4 +1,4 @@
-module Step1Lib
+module Data.Typeclass
   ( Typeclass
   , Typeclass'
   , class Cons

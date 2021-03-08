@@ -1,4 +1,4 @@
-module Step1111Impl where
+module Recursive1 where
 
 import Prelude
 
@@ -6,7 +6,7 @@ import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Step1Lib (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get, uncons)
+import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get, uncons)
 import Type.Proxy (Proxy(..))
 
 data Peano
@@ -76,8 +76,8 @@ myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: 
 yourShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => ShowPeanoAlt p => Cons x ShowMe head tail (BaseShow p) => x -> String
 yourShow = get (Proxy :: Proxy ShowMe) ((yourShows :: YourShows p) (asPeano (Proxy :: Proxy x)))
 
-step1111 :: Effect Unit
-step1111 = do
+recursive1 :: Effect Unit
+recursive1 = do
   log $ myShow true
   log $ myShow (Proxy :: Proxy Z)
   log $ myShow (Proxy :: Proxy (Succ Z))
