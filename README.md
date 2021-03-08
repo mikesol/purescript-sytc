@@ -59,15 +59,27 @@ type MyShows
   = TypeclassCons' Int ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')
 
 myShows :: Typeclass MyShows
-myShows = cons (Proxy :: Proxy Int) (ShowMe $ show) empty (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
+myShows =
+  cons (Proxy :: Proxy Int)
+    (ShowMe $ show)
+    empty
+    (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
 
-myShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
+myShow ::
+  forall x head tail.
+  Cons x ShowMe head tail MyShows => x -> String
 myShow = get (Proxy :: Proxy ShowMe) myShows
 
 yourShows :: Typeclass MyShows
-yourShows = cons (Proxy :: Proxy Int) (ShowMe $ const "Fooled you with a fake integer!") empty (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
+yourShows =
+  cons (Proxy :: Proxy Int)
+    (ShowMe $ const "Fooled you with a fake integer!")
+    empty
+    (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
 
-yourShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
+yourShow ::
+  forall x head tail.
+  Cons x ShowMe head tail MyShows => x -> String
 yourShow = get (Proxy :: Proxy ShowMe) yourShows
 
 meanShows :: Typeclass MyShows
@@ -79,7 +91,9 @@ meanShows =
   in
     union h t
 
-meanShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
+meanShow ::
+  forall x head tail.
+  Cons x ShowMe head tail MyShows => x -> String
 meanShow = get (Proxy :: Proxy ShowMe) meanShows
 
 niceShows :: Typeclass MyShows
@@ -91,7 +105,9 @@ niceShows =
   in
     union h t
 
-niceShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
+niceShow ::
+  forall x head tail.
+  Cons x ShowMe head tail MyShows => x -> String
 niceShow = get (Proxy :: Proxy ShowMe) niceShows
 
 basic :: Effect Unit
