@@ -83,5 +83,5 @@ step111 :: Effect Unit
 step111 = do
   log $ myShow true
   log $ myShow (Proxy :: Proxy Z)
-  log $ myShow (Proxy :: Proxy (Succ Z))
+  --log $ myShow (Proxy :: Proxy (Succ Z))
   pure unit
