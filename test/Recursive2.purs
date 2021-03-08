@@ -8,12 +8,6 @@ import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
 
-data Peano
-
-foreign import data Z :: Peano
-
-foreign import data Succ :: Peano -> Peano
-
 newtype ShowMe a
   = ShowMe (a -> String)
 
@@ -25,7 +19,7 @@ type BaseShow
 type MyShows
   = Typeclass BaseShow
 
-myShow :: forall x head tail. Show x => Cons x ShowMe head tail BaseShow => x -> String
+myShow :: forall x head tail. Cons x ShowMe head tail BaseShow => x -> String
 myShow x = get (Proxy :: Proxy ShowMe) (myShows unit) x
 
 myShows :: Unit -> MyShows

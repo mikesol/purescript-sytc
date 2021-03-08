@@ -1,37 +1,32 @@
 module Basic where
 
 import Prelude
-import Data.Tuple (fst)
+import Data.Newtype (class Newtype)
+import Data.Tuple.Nested ((/\))
+import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union)
 import Type.Proxy (Proxy(..))
-import Data.Tuple.Nested ((/\))
 
 newtype ShowMe a
   = ShowMe (a -> String)
 
+derive instance newtypeShowMe :: Newtype (ShowMe a) _
+
 type MyShows
   = TypeclassCons' Int ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')
-
-shower :: forall x head tail row. Cons x ShowMe head tail row => Typeclass row -> x -> String
-shower row x =
-  let
-    (ShowMe f) = fst (uncons (Proxy :: Proxy x) row)
-  in
-    f x
 
 myShows :: Typeclass MyShows
 myShows = cons (Proxy :: Proxy Int) (ShowMe $ show) empty (cons (Proxy :: Proxy Boolean) (ShowMe $ const "Fooled you with a fake boolean!") empty empty)
 
 myShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
-myShow = shower myShows
+myShow = get (Proxy :: Proxy ShowMe) myShows
 
 yourShows :: Typeclass MyShows
 yourShows = cons (Proxy :: Proxy Int) (ShowMe $ const "Fooled you with a fake integer!") empty (cons (Proxy :: Proxy Boolean) (ShowMe $ show) empty empty)
 
 yourShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
-yourShow = shower yourShows
+yourShow = get (Proxy :: Proxy ShowMe) yourShows
 
 meanShows :: Typeclass MyShows
 meanShows =
@@ -43,7 +38,7 @@ meanShows =
     union h t
 
 meanShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
-meanShow = shower meanShows
+meanShow = get (Proxy :: Proxy ShowMe) meanShows
 
 niceShows :: Typeclass MyShows
 niceShows =
@@ -55,7 +50,7 @@ niceShows =
     union h t
 
 niceShow :: forall x head tail. Cons x ShowMe head tail MyShows => x -> String
-niceShow = shower niceShows
+niceShow = get (Proxy :: Proxy ShowMe) niceShows
 
 basic :: Effect Unit
 basic = do

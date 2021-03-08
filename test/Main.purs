@@ -2,6 +2,7 @@ module Test.Main where
 
 import Prelude
 import Basic (basic)
+import ConstraintPolymorphism (constraintPolymorphism)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Recursive1 (recursive1)
@@ -10,11 +11,13 @@ import ShowOverride (showOverride)
 
 main :: Effect Unit
 main = do
-  log "**** basic "
+  log "**** basic"
   basic
-  log "**** showOverride "
+  log "**** showOverride"
   showOverride
-  log "**** recursive1 "
+  log "**** recursive1"
   recursive1
-  log "**** recursive2 "
+  log "**** recursive2"
   recursive2
+  log "**** constraint polymorphism"
+  constraintPolymorphism
