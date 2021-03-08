@@ -20,7 +20,6 @@ import Prelude
 import Data.List (List(..), (:))
 import Data.Tuple.Nested ((/\), type (/\))
 import Partial.Unsafe (unsafeCrashWith)
-import Prim.TypeError (class Fail, Text)
 import Type.Proxy (Proxy)
 import Unsafe.Coerce (unsafeCoerce)
 
@@ -39,13 +38,6 @@ empty :: Typeclass TypeclassNil'
 empty = mempty
 
 newtype Typeclass (c :: Typeclass') = Typeclass (List (Void /\ Void))
-
-class Lacks :: forall (label :: Type). label -> Typeclass' -> Constraint
-class Lacks label row 
-
-instance lacksTypeclassNil' :: Lacks a TypeclassNil'
-instance lacksTypeclassCons'Fail :: Fail (Text "Typeclass' does not lack this type") => Lacks a (TypeclassCons' a f y)
-else instance lacksTypeclassCons' :: Lacks a y => Lacks a (TypeclassCons' b f y)
 
 class HomogeneousOp' :: (Type -> Type) -> Typeclass' -> Constraint
 class HomogeneousOp' op row

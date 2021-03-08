@@ -2,8 +2,9 @@ module Main where
 
 import Prelude
 import Effect (Effect)
---import Step0 (step0)
+import Step111Impl (step111)
 import Step1Impl (step1)
+import Step2Impl (step2)
 
 main :: Effect Unit
-main = step1
+main = step111
