@@ -8,11 +8,11 @@ import Data.Typeclass
   , Typeclass
   , TypeclassCons'
   , TypeclassNil'
-  , cons
   , empty
   , uncons
   , union
   , get
+  , conz
   )
 import Effect (Effect)
 import Effect.Class.Console (log)
@@ -28,10 +28,9 @@ type MyShows
 
 myShows :: Typeclass MyShows
 myShows =
-  cons
+  conz
     (ShowMe $ (show :: Int -> String))
-    empty
-    (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty empty)
+    (conz (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty)
 
 myShow ::
   forall x head tail.
@@ -40,10 +39,9 @@ myShow = get (Proxy :: Proxy ShowMe) myShows
 
 yourShows :: Typeclass MyShows
 yourShows =
-  cons
+  conz
     (ShowMe $ \(_ :: Int) -> "Fooled you with a fake integer!")
-    empty
-    (cons (ShowMe $ (show :: Boolean -> String)) empty empty)
+    (conz (ShowMe $ (show :: Boolean -> String)) empty)
 
 yourShow ::
   forall x head tail.

@@ -14,6 +14,7 @@ module Data.Typeclass
   , class Union
   , union
   , get
+  , conz
   ) where
 
 import Prelude
@@ -86,3 +87,9 @@ instance unionTypeclassCons' :: (HomogeneousOp a, HomogeneousOp b, HomogeneousOp
 
 get :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail row => Proxy f -> Typeclass row -> f'
 get _ row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
+
+conz ::
+  forall label func tail row.
+  Cons label func TypeclassNil' tail row =>
+  func label -> Typeclass tail -> Typeclass row
+conz a b = cons a empty b
