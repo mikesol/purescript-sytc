@@ -3,7 +3,17 @@ module Basic where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, uncons, union, get)
+import Data.Typeclass
+  ( class Cons
+  , Typeclass
+  , TypeclassCons'
+  , TypeclassNil'
+  , cons
+  , empty
+  , uncons
+  , union
+  , get
+  )
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
