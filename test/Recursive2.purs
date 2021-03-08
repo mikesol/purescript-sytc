@@ -1,11 +1,11 @@
 module Recursive2 where
 
 import Prelude
-import Data.Maybe (Maybe(..))
+import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
+import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get)
 import Type.Proxy (Proxy(..))
 
 data Peano
@@ -19,19 +19,26 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
-type BaseShow a
-  = TypeclassCons' (Maybe Int) ShowMe (TypeclassCons' a ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+type BaseShow
+  = TypeclassCons' (Maybe Int) ShowMe (TypeclassCons' Int ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
 
-type MyShows a
-  = Show a => Proxy a -> Typeclass (BaseShow a)
+type MyShows
+  = Typeclass BaseShow
 
-myShows :: forall a. MyShows a
+myShow :: forall x head tail. Show x => Cons x ShowMe head tail BaseShow => x -> String
+myShow x = get (Proxy :: Proxy ShowMe) (myShows unit) x
+
+myShows :: Unit -> MyShows
 myShows _ =
   cons
     (Proxy :: Proxy (Maybe Int))
-    (ShowMe $ const "Everyone loves a Maybe Int!")
+    ( ShowMe
+        ( maybe "Nothing"
+            (append "One less than Maybe " <<< myShow <<< (_ + 1))
+        )
+    )
     empty
-    ( cons (Proxy :: Proxy a)
+    ( cons (Proxy :: Proxy Int)
         (ShowMe $ show)
         empty
         ( cons (Proxy :: Proxy Boolean)
@@ -41,11 +48,8 @@ myShows _ =
         )
     )
 
-myShow :: forall x head tail. Show x => Cons x ShowMe head tail (BaseShow x) => x -> String
-myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows x) (Proxy :: Proxy x))
-
 recursive2 :: Effect Unit
 recursive2 = do
   log $ myShow true
-  log $ myShow (Just unit)
-  log $ myShow (Just 1)
+  log $ myShow (Just 42)
+  log $ myShow 1
