@@ -49,7 +49,9 @@ else instance asPeanoZ :: AsPeano (Proxy Z) Z where
 else instance asPeanoX :: AsPeano x Z where
   asPeano _ = Proxy :: Proxy Z
 
-type MyShows (p :: Peano) = ShowPeano p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+type BaseShow (p :: Peano) = TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')
+
+type MyShows (p :: Peano) = ShowPeano p => Proxy p -> Typeclass (BaseShow p)
 
 myShows :: forall (p :: Peano). MyShows p
 myShows _ =
@@ -68,10 +70,10 @@ yourShows _ =
   in
     cons (Proxy :: Proxy (Proxy p)) (ShowMe showPeanoAlt) empty t
 
-myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')) => x -> String
+myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (BaseShow p) => x -> String
 myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))
 
-yourShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => ShowPeanoAlt p => Cons x ShowMe head tail (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')) => x -> String
+yourShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => ShowPeanoAlt p => Cons x ShowMe head tail (BaseShow p) => x -> String
 yourShow = get (Proxy :: Proxy ShowMe) ((yourShows :: YourShows p) (asPeano (Proxy :: Proxy x)))
 
 step1111 :: Effect Unit
