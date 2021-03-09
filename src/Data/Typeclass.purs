@@ -21,6 +21,7 @@ module Data.Typeclass
   , type (@@)
   , type (@>)
   , (@>)
+  , (@-)
   ) where
 
 import Prelude
@@ -114,3 +115,4 @@ conz ::
 conz a b = cons a empty b
 
 infixr 5 conz as @>
+infixr 5 uncons as @-
