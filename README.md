@@ -53,9 +53,9 @@ import Data.Typeclass
   , type (@>)
   , (@>)
   , (@-)
+  , (<@>)
   , empty
   , get
-  , union
   )
 import Effect (Effect)
 import Effect.Class.Console (log)
@@ -98,7 +98,7 @@ meanShows =
 
     _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- yourShows
   in
-    union h t
+    h <@> t
 
 meanShow ::
   forall x head tail.
@@ -112,7 +112,7 @@ niceShows =
 
     _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- myShows
   in
-    union h t
+    h <@> t
 
 niceShow ::
   forall x head tail.
