@@ -9,6 +9,10 @@ module Data.Typeclass
   , TypeclassRow'
   , TypeclassNil'
   , TypeclassCons'
+  , TypeclassType'
+  , TypeclassSingleton'
+  , TypeclassStream'
+  , TypeclassConsSingleton
   , class NegCons
   , class PosCons
   , negCons
@@ -23,6 +27,7 @@ module Data.Typeclass
   , (@-)
   , (<@@>)
   , using
+  , using_
   ) where
 
 import Prelude
@@ -37,7 +42,14 @@ import Unsafe.Coerce (unsafeCoerce)
 
 data TypeclassRow'
 
-foreign import data TypeclassCons' :: forall k. k -> TypeclassRow' -> TypeclassRow'
+data TypeclassType'
+
+foreign import data TypeclassSingleton' :: forall k. k -> TypeclassType'
+
+-- initial generator indexedrow
+foreign import data TypeclassStream' :: forall k. k -> (k -> k) -> (k -> TypeclassRow') -> TypeclassType'
+
+foreign import data TypeclassCons' :: TypeclassType' -> TypeclassRow' -> TypeclassRow'
 foreign import data TypeclassNil' :: TypeclassRow'
 
 foreign import data TypeclassC' :: forall k. (k -> Type) -> TypeclassRow' -> Typeclass'
@@ -45,7 +57,10 @@ foreign import data TypeclassC' :: forall k. (k -> Type) -> TypeclassRow' -> Typ
 data Typeclass'
 
 infixr 5 type TypeclassC' as @@
-infixr 6 type TypeclassCons' as @>
+
+-- type TypeclassConsSingleton :: forall k. k -> TypeclassRow' -> TypeclassRow'
+type TypeclassConsSingleton k r = TypeclassCons' (TypeclassSingleton' k) r
+infixr 6 type TypeclassConsSingleton as @>
 type TNil = TypeclassNil'
 
 newtype Typeclass (c :: Typeclass') = Typeclass (List Void)
@@ -59,15 +74,22 @@ instance monoidTypeclassNil' :: Monoid (Typeclass (TypeclassC' a TypeclassNil'))
 tnil :: forall f. Typeclass (TypeclassC' f TypeclassNil')
 tnil = mempty
 
-
+----------------------
+--------------
+------
+---
+-- stuck here
+-- interesting problem: let's say that we get to a branch
+-- it means that we will be pattern matching EITHER against the generator OR against the original
+---------------------------------
 class NegCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
 class NegCons label func head row | label row -> func head where
   negCons :: Proxy label -> Typeclass row -> func label /\ Typeclass head
 
-instance negConsCacheHit :: NegCons l f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' l c)) where
+instance negConsCacheHit :: NegCons l f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
   negCons _ (Typeclass (a : b)) = unsafeCoerce a /\ Typeclass Nil
   negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance negConsCacheMiss :: NegCons l f (TypeclassC' f notC) (TypeclassC' f c) => NegCons l f (TypeclassC' f (TypeclassCons' notL notC)) (TypeclassC' f (TypeclassCons' notL c)) where
+else instance negConsCacheMiss :: NegCons l f (TypeclassC' f notC) (TypeclassC' f c) => NegCons l f (TypeclassC' f (TypeclassCons' (TypeclassSingleton' notL) notC)) (TypeclassC' f (TypeclassCons' (TypeclassSingleton' notL) c)) where
   negCons l (Typeclass (a : b)) = let x /\ (Typeclass y) = (negCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass (TypeclassC' f notC)) l (Typeclass b) in x /\ (Typeclass (a : y))
   negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
 
@@ -75,10 +97,10 @@ class PosCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass
 class PosCons label func tail row | label row -> func tail where
   posCons :: Proxy label -> Typeclass row -> func label /\ Typeclass tail
 
-instance posConsCacheHit :: PosCons l f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' l c)) where
+instance posConsCacheHit :: PosCons l f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
   posCons _ (Typeclass (a : b)) = unsafeCoerce a /\ Typeclass b
   posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance posConsCacheMiss :: PosCons l f o (TypeclassC' f c) => PosCons l f o (TypeclassC' f (TypeclassCons' notL c)) where
+else instance posConsCacheMiss :: PosCons l f o (TypeclassC' f c) => PosCons l f o (TypeclassC' f (TypeclassCons' (TypeclassSingleton' notL) c)) where
   posCons l (Typeclass (a : b)) = (posCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass o) l (Typeclass b)
   posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
 
@@ -108,6 +130,9 @@ instance unionTypeclassCons' :: Union (TypeclassC' f a) b (TypeclassC' f o) => U
 
 using :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail (TypeclassC' f row) => Typeclass (TypeclassC' f row) -> f'
 using row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
+
+using_ :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail (TypeclassC' f row) => (Unit -> Typeclass (TypeclassC' f row) )-> f'
+using_ row = unwrap $ fst (uncons (Proxy :: Proxy x) (row unit))
 
 conz ::
   forall label func tail row.

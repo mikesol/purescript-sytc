@@ -3,7 +3,7 @@ module Recursive2 where
 import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, using, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil)
+import Data.Typeclass (Typeclass, TypeclassC', TypeclassCons', TypeclassNil', TypeclassSingleton', cons, conz, tnil, using_)
 import Effect (Effect)
 import Effect.Class.Console (log)
 
@@ -13,34 +13,30 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow
-  = TypeclassC' ShowMe (TypeclassCons' (Maybe Int) (TypeclassCons' Int (TypeclassCons' Boolean TypeclassNil')))
+  = TypeclassC' ShowMe (TypeclassCons' (TypeclassSingleton' (Maybe Int)) (TypeclassCons' (TypeclassSingleton' Int) (TypeclassCons' (TypeclassSingleton' Boolean) TypeclassNil')))
 
 type MyShows
   = Typeclass BaseShow
 
-myShow :: forall x head tail. Cons x ShowMe head tail BaseShow => x -> String
-myShow x = using (myShows unit) x
-
-myShows :: Unit -> MyShows
-myShows _ =
-  cons
+myShow :: Unit -> MyShows
+myShow _ =
+  conz
     ( ShowMe
         ( maybe "Nothing"
-            (append "One less than Maybe " <<< myShow <<< (_ + 1))
+            -- for recursion
+            (\x -> append "One less than Maybe " $ using_ myShow $ (_ + 1) x)
         )
     )
-    tnil
-    ( cons (ShowMe $ (show :: Int -> String))
-        tnil
-        ( cons
+    ( conz (ShowMe $ (show :: Int -> String))
+        ( conz
             (ShowMe $ (show :: Boolean -> String))
-            tnil
             tnil
         )
     )
 
 recursive2 :: Effect Unit
 recursive2 = do
-  log $ myShow true
-  log $ myShow (Just 42)
-  log $ myShow 1
+  log $ using_ myShow true
+
+--log $ using_ myShow (Just 42)
+--log $ using_ myShow 1

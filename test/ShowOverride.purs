@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, using)
+import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', TypeclassSingleton', cons, tnil, using)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -16,7 +16,7 @@ derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow :: forall k. k -> Typeclass'
 type BaseShow a
-  = TypeclassC' ShowMe (TypeclassCons' (Maybe Int) (TypeclassCons' a (TypeclassCons' Boolean TypeclassNil')))
+  = TypeclassC' ShowMe (TypeclassCons' (TypeclassSingleton' (Maybe Int)) (TypeclassCons' (TypeclassSingleton' a) (TypeclassCons' (TypeclassSingleton' Boolean) TypeclassNil')))
 
 type MyShows a
   = Show a => Proxy a -> Typeclass (BaseShow a)
