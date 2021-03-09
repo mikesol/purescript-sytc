@@ -4,16 +4,10 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get)
+import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, using)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
-
-data Peano
-
-foreign import data Z :: Peano
-
-foreign import data Succ :: Peano -> Peano
 
 newtype ShowMe a
   = ShowMe (a -> String)
@@ -43,7 +37,7 @@ myShows _ =
     )
 
 myShow :: forall x head tail. Show x => Cons x ShowMe head tail (BaseShow x) => x -> String
-myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows x) (Proxy :: Proxy x))
+myShow = using ((myShows :: MyShows x) (Proxy :: Proxy x))
 
 showOverride :: Effect Unit
 showOverride = do

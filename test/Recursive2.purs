@@ -3,10 +3,9 @@ module Recursive2 where
 import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get)
+import Data.Typeclass (class Cons, using, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Type.Proxy (Proxy(..))
 
 newtype ShowMe a
   = ShowMe (a -> String)
@@ -20,7 +19,7 @@ type MyShows
   = Typeclass BaseShow
 
 myShow :: forall x head tail. Cons x ShowMe head tail BaseShow => x -> String
-myShow x = get (Proxy :: Proxy ShowMe) (myShows unit) x
+myShow x = using (myShows unit) x
 
 myShows :: Unit -> MyShows
 myShows _ =

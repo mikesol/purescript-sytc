@@ -45,18 +45,7 @@ module Basic where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass
-  ( class Cons
-  , Typeclass
-  , TNil
-  , type (@@)
-  , type (@>)
-  , (@>)
-  , (@-)
-  , (@!)
-  , (<@@>)
-  , tnil
-  )
+import Data.Typeclass (type (@>), type (@@), TNil, Typeclass, tnil, using, (<@@>), (@-), (@>))
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -66,69 +55,49 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
-type MyShows
+type Show'
   = ShowMe @@ Int @> Boolean @> TNil
 
-myShows :: Typeclass MyShows
-myShows =
+myShow :: Typeclass Show'
+myShow =
   ShowMe (show :: Int -> String)
     @> ShowMe (\(_ :: Boolean) -> "Fooled you with a fake boolean!")
     @> tnil
 
-myShow ::
-  forall x head tail.
-  Cons x ShowMe head tail MyShows => x -> String
-myShow = (Proxy :: Proxy ShowMe) @! myShows
-
-yourShows :: Typeclass MyShows
-yourShows =
+yourShow :: Typeclass Show'
+yourShow =
   (ShowMe $ \(_ :: Int) -> "Fooled you with a fake integer!")
     @> (ShowMe $ (show :: Boolean -> String))
     @> tnil
 
-yourShow ::
-  forall x head tail.
-  Cons x ShowMe head tail MyShows => x -> String
-yourShow = (Proxy :: Proxy ShowMe) @! yourShows
-
-meanShows :: Typeclass MyShows
-meanShows =
+meanShow :: Typeclass Show'
+meanShow =
   let
-    _ /\ _ /\ t = (Proxy :: Proxy Int) @- myShows
+    _ /\ _ /\ t = (Proxy :: Proxy Int) @- myShow
 
-    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- yourShows
+    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- yourShow
   in
     h <@@> t
 
-meanShow ::
-  forall x head tail.
-  Cons x ShowMe head tail MyShows => x -> String
-meanShow = (Proxy :: Proxy ShowMe) @! meanShows
-
-niceShows :: Typeclass MyShows
-niceShows =
+niceShow :: Typeclass Show'
+niceShow =
   let
-    _ /\ _ /\ t = (Proxy :: Proxy Int) @- yourShows
+    _ /\ _ /\ t = (Proxy :: Proxy Int) @- yourShow
 
-    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- myShows
+    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- myShow
   in
     h <@@> t
-
-niceShow ::
-  forall x head tail.
-  Cons x ShowMe head tail MyShows => x -> String
-niceShow = (Proxy :: Proxy ShowMe) @! niceShows
 
 basic :: Effect Unit
 basic = do
-  log $ myShow true
-  log $ myShow 1
-  log $ yourShow true
-  log $ yourShow 1
-  log $ niceShow true
-  log $ niceShow 1
-  log $ meanShow true
-  log $ meanShow 1
+  log $ using myShow true
+  log $ using myShow 1
+  log $ using yourShow true
+  log $ using yourShow 1
+  log $ using niceShow true
+  log $ using niceShow 1
+  log $ using meanShow true
+  log $ using meanShow 1
 ```
 
 Produces:
@@ -152,10 +121,9 @@ module ConstraintPolymorphism where
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, type (@@), type (@>), TNil, (@>), tnil, get)
+import Data.Typeclass (using, Typeclass, type (@@), type (@>), TNil, (@>), tnil)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Type.Proxy (Proxy(..))
 
 newtype ShowMe a
   = ShowMe (a -> String)
@@ -168,22 +136,16 @@ type BaseShow a
 type MyShows a
   = Typeclass (BaseShow a)
 
-myShow ::
-  forall a x head tail.
-  Cons x ShowMe head tail (BaseShow a) =>
-  Typeclass (ShowMe @@ a) -> x -> String
-myShow a x = get (Proxy :: Proxy ShowMe) (myShows a) x
-
-myShows :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
-myShows a = (ShowMe $ (show :: Int -> String)) @> a
+myShow :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
+myShow a = (ShowMe $ (show :: Int -> String)) @> a
 
 extension :: Typeclass (ShowMe @@ (Boolean @> TNil))
 extension = (ShowMe $ (show :: Boolean -> String)) @> tnil
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
-  log $ myShow extension true
-  log $ myShow tnil 1
+  log $ using (myShow extension) true
+  log $ using (myShow tnil) 1
 ```
 
 # More examples

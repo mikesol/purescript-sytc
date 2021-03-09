@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get, uncons)
+import Data.Typeclass (using, class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, uncons)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -70,10 +70,10 @@ yourShows _ =
     cons (ShowMe (showPeanoAlt :: Proxy p -> String)) tnil t
 
 myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (BaseShow p) => x -> String
-myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))
+myShow = using ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))
 
 yourShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => ShowPeanoAlt p => Cons x ShowMe head tail (BaseShow p) => x -> String
-yourShow = get (Proxy :: Proxy ShowMe) ((yourShows :: YourShows p) (asPeano (Proxy :: Proxy x)))
+yourShow = using ((yourShows :: YourShows p) (asPeano (Proxy :: Proxy x)))
 
 recursive1 :: Effect Unit
 recursive1 = do

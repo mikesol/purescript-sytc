@@ -15,7 +15,6 @@ module Data.Typeclass
   , posCons
   , class Union
   , union
-  , get
   , conz
   , TNil
   , type (@@)
@@ -23,7 +22,7 @@ module Data.Typeclass
   , (@>)
   , (@-)
   , (<@@>)
-  , (@!)
+  , using
   ) where
 
 import Prelude
@@ -107,8 +106,8 @@ instance unionTypeclassNil' :: Union (TypeclassC' c TypeclassNil') (TypeclassC' 
 instance unionTypeclassCons' :: Union (TypeclassC' f a) b (TypeclassC' f o) => Union (TypeclassC' f (TypeclassCons' k a)) b (TypeclassC' f (TypeclassCons' k o)) where
   union (Typeclass a) (Typeclass b) = Typeclass (a <> b)
 
-get :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail row => Proxy f -> Typeclass row -> f'
-get _ row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
+using :: forall x f f' head tail row. Newtype (f x) f' => Cons x f head tail (TypeclassC' f row) => Typeclass (TypeclassC' f row) -> f'
+using row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
 
 conz ::
   forall label func tail row.
@@ -119,4 +118,3 @@ conz a b = cons a tnil b
 infixr 5 conz as @>
 infixr 5 uncons as @-
 infixr 5 union as <@@>
-infixr 5 get as @!
