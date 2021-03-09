@@ -116,6 +116,8 @@ Fooled you with a fake integer!
 
 # Constraint polymorphism
 
+This technique makes constraint polymorphism possible. In the example below, `MyShow` acts like a polymorphic constraint that is then extended by `extension`.
+
 ```purescript
 module ConstraintPolymorphism where
 
