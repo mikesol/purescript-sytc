@@ -1,9 +1,9 @@
 module Recursive2 where
 
 import Prelude
-import Data.Maybe (Maybe(..), maybe)
+import Data.Maybe (Maybe, maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (Typeclass, TypeclassC', TypeclassCons', TypeclassNil', TypeclassSingleton', cons, conz, tnil, using_)
+import Data.Typeclass (Typeclass, TypeclassC', TypeclassCons', TypeclassNil', TypeclassSingleton', conz, tnil, using_)
 import Effect (Effect)
 import Effect.Class.Console (log)
 
@@ -23,7 +23,7 @@ myShow _ =
   conz
     ( ShowMe
         ( maybe "Nothing"
-            -- for recursion
+            -- function needed to avoid stack overflow in 0.14
             (\x -> append "One less than Maybe " $ using_ myShow $ (_ + 1) x)
         )
     )
