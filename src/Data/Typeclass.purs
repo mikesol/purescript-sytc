@@ -17,6 +17,10 @@ module Data.Typeclass
   , union
   , get
   , conz
+  , TNil
+  , type (@@)
+  , type (@>)
+  , (@>)
   ) where
 
 import Prelude
@@ -37,6 +41,10 @@ foreign import data TypeclassNil' :: TypeclassRow'
 foreign import data TypeclassC' :: forall k. (k -> Type) -> TypeclassRow' -> Typeclass'
 
 data Typeclass'
+
+infixr 5 type TypeclassC' as @@
+infixr 6 type TypeclassCons' as @>
+type TNil = TypeclassNil'
 
 newtype Typeclass (c :: Typeclass') = Typeclass (List Void)
 
@@ -104,3 +112,5 @@ conz ::
   Cons label func (TypeclassC' func TypeclassNil') tail row =>
   func label -> Typeclass tail -> Typeclass row
 conz a b = cons a empty b
+
+infixr 5 conz as @>

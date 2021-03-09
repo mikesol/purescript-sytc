@@ -45,7 +45,7 @@ module Basic where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', conz, empty, get, uncons, union)
+import Data.Typeclass (class Cons, Typeclass, TNil, type (@@), type (@>), (@>), empty, get, uncons, union)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -56,13 +56,13 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type MyShows
-  = TypeclassC' ShowMe (TypeclassCons' Int (TypeclassCons' Boolean TypeclassNil'))
+  = ShowMe @@ Int @> Boolean @> TNil
 
 myShows :: Typeclass MyShows
 myShows =
-  conz
-    (ShowMe $ (show :: Int -> String))
-    (conz (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty)
+  ShowMe (show :: Int -> String)
+    @> ShowMe (\(_ :: Boolean) -> "Fooled you with a fake boolean!")
+    @> empty
 
 myShow ::
   forall x head tail.
@@ -71,9 +71,9 @@ myShow = get (Proxy :: Proxy ShowMe) myShows
 
 yourShows :: Typeclass MyShows
 yourShows =
-  conz
-    (ShowMe $ \(_ :: Int) -> "Fooled you with a fake integer!")
-    (conz (ShowMe $ (show :: Boolean -> String)) empty)
+  (ShowMe $ \(_ :: Int) -> "Fooled you with a fake integer!")
+    @> (ShowMe $ (show :: Boolean -> String))
+    @> empty
 
 yourShow ::
   forall x head tail.
@@ -141,7 +141,7 @@ module ConstraintPolymorphism where
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', conz, empty, get)
+import Data.Typeclass (class Cons, Typeclass, type (@@), type (@>), TNil, (@>), empty, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -152,7 +152,7 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow a
-  = TypeclassC' ShowMe (TypeclassCons' Int a)
+  = ShowMe @@ (Int @> a)
 
 type MyShows a
   = Typeclass (BaseShow a)
@@ -160,14 +160,14 @@ type MyShows a
 myShow ::
   forall a x head tail.
   Cons x ShowMe head tail (BaseShow a) =>
-  Typeclass (TypeclassC' ShowMe a) -> x -> String
+  Typeclass (ShowMe @@ a) -> x -> String
 myShow a x = get (Proxy :: Proxy ShowMe) (myShows a) x
 
-myShows :: forall a. Typeclass (TypeclassC' ShowMe a) -> MyShows a
-myShows a = conz (ShowMe $ (show :: Int -> String)) a
+myShows :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
+myShows a = (ShowMe $ (show :: Int -> String)) @> a
 
-extension :: Typeclass (TypeclassC' ShowMe (TypeclassCons' Boolean TypeclassNil'))
-extension = (conz (ShowMe $ (show :: Boolean -> String)) empty)
+extension :: Typeclass (ShowMe @@ (Boolean @> TNil))
+extension = (ShowMe $ (show :: Boolean -> String)) @> empty
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
