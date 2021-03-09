@@ -3,17 +3,7 @@ module Basic where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass
-  ( class Cons
-  , Typeclass
-  , TypeclassCons'
-  , TypeclassNil'
-  , empty
-  , uncons
-  , union
-  , get
-  , conz
-  )
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', conz, empty, get, uncons, union)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -24,7 +14,7 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type MyShows
-  = TypeclassCons' Int ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')
+  = TypeclassC' ShowMe (TypeclassCons' Int (TypeclassCons' Boolean TypeclassNil'))
 
 myShows :: Typeclass MyShows
 myShows =

@@ -1,11 +1,12 @@
 module ShowOverride where
 
 import Prelude
+
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
+import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get)
 import Type.Proxy (Proxy(..))
 
 data Peano
@@ -19,8 +20,9 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
+type BaseShow :: forall k. k -> Typeclass'
 type BaseShow a
-  = TypeclassCons' (Maybe Int) ShowMe (TypeclassCons' a ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+  = TypeclassC' ShowMe (TypeclassCons' (Maybe Int) (TypeclassCons' a (TypeclassCons' Boolean TypeclassNil')))
 
 type MyShows a
   = Show a => Proxy a -> Typeclass (BaseShow a)

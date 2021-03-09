@@ -3,7 +3,7 @@ module Recursive2 where
 import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get)
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -14,7 +14,7 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow
-  = TypeclassCons' (Maybe Int) ShowMe (TypeclassCons' Int ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+  = TypeclassC' ShowMe (TypeclassCons' (Maybe Int) (TypeclassCons' Int (TypeclassCons' Boolean TypeclassNil')))
 
 type MyShows
   = Typeclass BaseShow

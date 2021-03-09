@@ -2,16 +2,7 @@ module ConstraintPolymorphism where
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Data.Typeclass
-  ( class Cons
-  , class HomogeneousOp'
-  , Typeclass
-  , TypeclassCons'
-  , TypeclassNil'
-  , conz
-  , empty
-  , get
-  )
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', conz, empty, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -22,25 +13,21 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow a
-  = TypeclassCons' Int ShowMe a
+  = TypeclassC' ShowMe (TypeclassCons' Int a)
 
 type MyShows a
   = Typeclass (BaseShow a)
 
 myShow ::
   forall a x head tail.
-  HomogeneousOp' ShowMe a =>
   Cons x ShowMe head tail (BaseShow a) =>
-  Typeclass a -> x -> String
+  Typeclass (TypeclassC' ShowMe a) -> x -> String
 myShow a x = get (Proxy :: Proxy ShowMe) (myShows a) x
 
-myShows ::
-  forall a.
-  HomogeneousOp' ShowMe a =>
-  Typeclass a -> MyShows a
+myShows :: forall a. Typeclass (TypeclassC' ShowMe a) -> MyShows a
 myShows a = conz (ShowMe $ (show :: Int -> String)) a
 
-extension :: Typeclass (TypeclassCons' Boolean ShowMe TypeclassNil')
+extension :: Typeclass (TypeclassC' ShowMe (TypeclassCons' Boolean TypeclassNil'))
 extension = (conz (ShowMe $ (show :: Boolean -> String)) empty)
 
 constraintPolymorphism :: Effect Unit

@@ -4,9 +4,9 @@ import Prelude
 
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get, uncons)
 import Effect (Effect)
 import Effect.Class.Console (log)
-import Data.Typeclass (class Cons, Typeclass, TypeclassCons', TypeclassNil', cons, empty, get, uncons)
 import Type.Proxy (Proxy(..))
 
 data Peano
@@ -49,7 +49,7 @@ else instance asPeanoZ :: AsPeano (Proxy Z) Z where
 else instance asPeanoX :: AsPeano x Z where
   asPeano _ = Proxy :: Proxy Z
 
-type BaseShow (p :: Peano) = TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil')
+type BaseShow (p :: Peano) = TypeclassC' ShowMe (TypeclassCons' (Proxy p) (TypeclassCons' Boolean TypeclassNil'))
 
 type MyShows (p :: Peano) = ShowPeano p => Proxy p -> Typeclass (BaseShow p)
 
@@ -60,7 +60,7 @@ myShows _ =
     empty
     (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty empty)
 
-type YourShows (p :: Peano) = ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassCons' (Proxy p) ShowMe (TypeclassCons' Boolean ShowMe TypeclassNil'))
+type YourShows (p :: Peano) = ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassC' ShowMe (TypeclassCons' (Proxy p) (TypeclassCons' Boolean TypeclassNil')))
 
 yourShows :: forall (p :: Peano). YourShows p
 yourShows _ =
