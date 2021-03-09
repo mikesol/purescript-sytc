@@ -2,7 +2,7 @@ module ConstraintPolymorphism where
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, type (@@), type (@>), TNil, (@>), empty, get)
+import Data.Typeclass (class Cons, Typeclass, type (@@), type (@>), TNil, (@>), tnil, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -28,9 +28,9 @@ myShows :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
 myShows a = (ShowMe $ (show :: Int -> String)) @> a
 
 extension :: Typeclass (ShowMe @@ (Boolean @> TNil))
-extension = (ShowMe $ (show :: Boolean -> String)) @> empty
+extension = (ShowMe $ (show :: Boolean -> String)) @> tnil
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
   log $ myShow extension true
-  log $ myShow empty 1
+  log $ myShow tnil 1

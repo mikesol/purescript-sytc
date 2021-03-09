@@ -3,7 +3,7 @@ module Recursive2 where
 import Prelude
 import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get)
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -30,13 +30,13 @@ myShows _ =
             (append "One less than Maybe " <<< myShow <<< (_ + 1))
         )
     )
-    empty
+    tnil
     ( cons (ShowMe $ (show :: Int -> String))
-        empty
+        tnil
         ( cons
             (ShowMe $ (show :: Boolean -> String))
-            empty
-            empty
+            tnil
+            tnil
         )
     )
 

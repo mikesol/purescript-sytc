@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.Newtype (class Newtype)
-import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get)
+import Data.Typeclass (class Cons, Typeclass, Typeclass', TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -31,14 +31,14 @@ myShows :: forall a. MyShows a
 myShows _ =
   cons
     (ShowMe $ \(_ :: Maybe Int) -> "Everyone loves a Maybe Int!")
-    empty
+    tnil
     ( cons
         (ShowMe $ (show :: a -> String))
-        empty
+        tnil
         ( cons
             (ShowMe $ (show :: Boolean -> String))
-            empty
-            empty
+            tnil
+            tnil
         )
     )
 

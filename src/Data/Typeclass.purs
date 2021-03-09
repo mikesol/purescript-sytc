@@ -4,7 +4,7 @@ module Data.Typeclass
   , class Cons
   , cons
   , uncons
-  , empty
+  , tnil
   , TypeclassC'
   , TypeclassRow'
   , TypeclassNil'
@@ -22,7 +22,8 @@ module Data.Typeclass
   , type (@>)
   , (@>)
   , (@-)
-  , (<@>)
+  , (<@@>)
+  , (@!)
   ) where
 
 import Prelude
@@ -56,8 +57,8 @@ instance semigroupTypeclassNil' :: Semigroup (Typeclass (TypeclassC' a Typeclass
 instance monoidTypeclassNil' :: Monoid (Typeclass (TypeclassC' a TypeclassNil')) where
  mempty = Typeclass Nil
 
-empty :: forall f. Typeclass (TypeclassC' f TypeclassNil')
-empty = mempty
+tnil :: forall f. Typeclass (TypeclassC' f TypeclassNil')
+tnil = mempty
 
 
 class NegCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
@@ -113,8 +114,9 @@ conz ::
   forall label func tail row.
   Cons label func (TypeclassC' func TypeclassNil') tail row =>
   func label -> Typeclass tail -> Typeclass row
-conz a b = cons a empty b
+conz a b = cons a tnil b
 
 infixr 5 conz as @>
 infixr 5 uncons as @-
-infixr 5 union as <@>
+infixr 5 union as <@@>
+infixr 5 get as @!

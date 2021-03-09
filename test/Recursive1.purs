@@ -4,7 +4,7 @@ import Prelude
 
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, empty, get, uncons)
+import Data.Typeclass (class Cons, Typeclass, TypeclassC', TypeclassCons', TypeclassNil', cons, tnil, get, uncons)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -57,8 +57,8 @@ myShows :: forall (p :: Peano). MyShows p
 myShows _ =
   cons
     (ShowMe (showPeano :: Proxy p -> String))
-    empty
-    (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") empty empty)
+    tnil
+    (cons (ShowMe $ \(_ :: Boolean) -> "Fooled you with a fake boolean!") tnil tnil)
 
 type YourShows (p :: Peano) = ShowPeano p => ShowPeanoAlt p => Proxy p -> Typeclass (TypeclassC' ShowMe (TypeclassCons' (Proxy p) (TypeclassCons' Boolean TypeclassNil')))
 
@@ -67,7 +67,7 @@ yourShows _ =
   let
     _ /\ _ /\ t = uncons (Proxy :: Proxy (Proxy p)) (myShows (Proxy :: Proxy p))
   in
-    cons (ShowMe (showPeanoAlt :: Proxy p -> String)) empty t
+    cons (ShowMe (showPeanoAlt :: Proxy p -> String)) tnil t
 
 myShow :: forall (p :: Peano) x head tail. AsPeano x p => ShowPeano p => Cons x ShowMe head tail (BaseShow p) => x -> String
 myShow = get (Proxy :: Proxy ShowMe) ((myShows :: MyShows p) (asPeano (Proxy :: Proxy x)))
