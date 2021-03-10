@@ -154,7 +154,7 @@ constraintPolymorphism = do
 
 Recursively defined typeclasses can be created with the induction operator `@!>`.
 
-At the typelevel, this takes a type `initial /@\ iterator`, where `/@\` is an infix operator taking the initial value and the iterator. At the term level, it takes a value of type `f (Proxy initial) /\ (forall x. \(Proxy x) -> (f (Proxy x)) -> (f (Proxy (iterator x))))`. Check out the example below:
+At the typelevel, this takes a type `initial /@\ iterator`, where `/@\` is an infix operator taking the initial value and the iterator. At the term level, it takes a value of type `f (Proxy initial) /\ (forall x. (Proxy x) -> (f (Proxy x)) -> (f (Proxy (iterator x))))`. Check out the example below:
 
 ```purescript
 module Recursive1 where
