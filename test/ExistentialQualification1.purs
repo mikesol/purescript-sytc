@@ -1,4 +1,4 @@
-module ExistentialQualification where
+module ExistentialQualification1 where
 
 import Prelude
 import Data.Typeclass (type (@>), type (@@), TNil, Typeclass, tnil, using', (@>))
@@ -12,6 +12,6 @@ type Show'
 myShow :: Typeclass Show'
 myShow = (const "I have no clue what my input is.") @> tnil
 
-existentialQualification :: Effect Unit
-existentialQualification = do
+existentialQualification1 :: Effect Unit
+existentialQualification1 = do
   log $ using' myShow (unsafeCoerce false)

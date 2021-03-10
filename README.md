@@ -32,6 +32,7 @@ Type class instances can't be modified once they're created. That means that, on
 1. We can't create [orphaned instances](https://github.com/purescript/documentation/blob/master/errors/OrphanInstance.md).
 1. We can't use information about type classes to determine the flow of a program. For example, we can't count how many instances they have, determine if they have instances of the same type, etc.
 1. We can't pass type classes as arguments to other type classes (also called constraint polymorphism). Meaning you can't do `class k a <= Foo k a` where `k` is a `Constraint` passed to `Foo`.
+1. We can't create a typeclass whose instance functions only use some of the arguments (ie if the class is `class Foo bar baz`, then both `bar` and `baz` must be used in all function definitions belonging to the class).
 
 This library provides a set of tools for working around those limitations.
 
