@@ -1,0 +1,28 @@
+{
+  "name": "purescript-extensible-typeclass",
+  "version": "1.0.0",
+  "description": "Type classes are ways to define the behavior of a function for certain types. Here's an example:",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "purescript": "^0.14.0",
+    "spago": "^0.19.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mikesol/purescript-extensible-typeclass.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mikesol/purescript-extensible-typeclass/issues"
+  },
+  "homepage": "https://github.com/mikesol/purescript-extensible-typeclass#readme"
+}
