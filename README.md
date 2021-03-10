@@ -1,4 +1,8 @@
-# purescript-extensible-typeclass
+# purescript-extensible-sytc
+
+[Scrap your (PureScript) typeclasses](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html).
+
+# Background
 
 Type classes are ways to define the behavior of a function for certain types. Here's an example:
 

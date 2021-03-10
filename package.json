@@ -1,5 +1,5 @@
 {
-  "name": "purescript-extensible-typeclass",
+  "name": "purescript-sytc",
   "version": "0.0.0",
   "description": "Type classes are ways to define the behavior of a function for certain types. Here's an example:",
   "main": "index.js",
@@ -16,13 +16,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mikesol/purescript-extensible-typeclass.git"
+    "url": "git+https://github.com/mikesol/purescript-sytc.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/mikesol/purescript-extensible-typeclass/issues"
+    "url": "https://github.com/mikesol/purescript-sytc/issues"
   },
-  "homepage": "https://github.com/mikesol/purescript-extensible-typeclass#readme"
+  "homepage": "https://github.com/mikesol/purescript-sytc#readme"
 }
