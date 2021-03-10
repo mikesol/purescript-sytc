@@ -1,9 +1,9 @@
 module Recursive2 where
 
 import Prelude
-import Data.Maybe (Maybe, maybe)
+import Data.Maybe (Maybe(..), maybe)
 import Data.Newtype (class Newtype)
-import Data.Typeclass (Typeclass, TypeclassC', TypeclassCons', TypeclassNil', TypeclassSingleton', (@>), tnil, using_)
+import Data.Typeclass (Typeclass, type (@>), type (@@), TNil, (@>), tnil, using_)
 import Effect (Effect)
 import Effect.Class.Console (log)
 
@@ -13,7 +13,7 @@ newtype ShowMe a
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
 type BaseShow
-  = TypeclassC' ShowMe (TypeclassCons' (TypeclassSingleton' (Maybe Int)) (TypeclassCons' (TypeclassSingleton' Int) (TypeclassCons' (TypeclassSingleton' Boolean) TypeclassNil')))
+  = ShowMe @@ Maybe Int @> Int @> Boolean @> TNil
 
 type MyShows
   = Typeclass BaseShow
@@ -32,6 +32,5 @@ myShow _ =
 recursive2 :: Effect Unit
 recursive2 = do
   log $ using_ myShow true
-
---log $ using_ myShow (Just 42)
---log $ using_ myShow 1
+  log $ using_ myShow (Just 42)
+  log $ using_ myShow 1
