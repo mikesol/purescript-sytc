@@ -1,6 +1,6 @@
 {
   "name": "purescript-extensible-typeclass",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "Type classes are ways to define the behavior of a function for certain types. Here's an example:",
   "main": "index.js",
   "directories": {
