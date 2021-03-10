@@ -1,4 +1,4 @@
-# purescript-extensible-sytc
+# purescript-sytc
 
 [Scrap your (PureScript) typeclasses](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html).
 
@@ -29,7 +29,7 @@ prog = do
   log $ show unit -- compiler error because we haven't defined Show Unit
 ```
 
-# Extensible type classes
+# Scrap your type classes
 
 Type class instances can't be modified once they're created. That means that, once `Show Unit` has been defined, we need to define a new type class if we want to override `Show Unit`. In most cases this is fine, but in some cases it won't work:
 
@@ -38,7 +38,7 @@ Type class instances can't be modified once they're created. That means that, on
 1. We can't pass type classes as arguments to other type classes (also called constraint polymorphism). Meaning you can't do `class k a <= Foo k a` where `k` is a `Constraint` passed to `Foo`.
 1. We can't create a typeclass whose instance functions only use some of the arguments (ie if the class is `class Foo bar baz`, then both `bar` and `baz` must be used in all function definitions belonging to the class).
 
-This library provides a set of tools for working around those limitations.
+This library provides a set of tools for working around those limitations. It is sort of like the [original sytc article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
 
 # API
 
