@@ -3,7 +3,18 @@ module Recursive1 where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (type (/@\), type (@!>), type (@>), type (@@), TNil, Typeclass, tnil, using, (@!>), (@>))
+import Data.Typeclass
+  ( type (/@\)
+  , type (@!>)
+  , type (@>)
+  , type (@@)
+  , TNil
+  , Typeclass
+  , tnil
+  , using
+  , (@!>)
+  , (@>)
+  )
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
