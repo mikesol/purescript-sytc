@@ -25,6 +25,7 @@ module Data.Typeclass
   , class Union
   , union
   , using'
+  , using''
   , consSingleton
   , consViaInduction
   , TNil
@@ -186,6 +187,10 @@ using row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
 
 using' :: forall x f head tail row. UnCons x f head tail (TypeclassC' f row) => Typeclass (TypeclassC' f row) -> f x
 using' row = fst (uncons (Proxy :: Proxy x) row)
+
+using'' :: forall x f head tail row g. UnCons x f head tail (TypeclassC' f row) => (f x -> g) -> Typeclass (TypeclassC' f row) -> g
+using'' f row = f $ fst (uncons (Proxy :: Proxy x) row)
+
 
 using_ :: forall x f f' head tail row. Newtype (f x) f' => UnCons x f head tail (TypeclassC' f row) => (Unit -> Typeclass (TypeclassC' f row) )-> f'
 using_ row = unwrap $ fst (uncons (Proxy :: Proxy x) (row unit))

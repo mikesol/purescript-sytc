@@ -9,6 +9,7 @@ import ExistentialQualification1 (existentialQualification1)
 import ExistentialQualification2 (existentialQualification2)
 import Recursive1 (recursive1)
 import Recursive2 (recursive2)
+import Test.Functor (functor)
 
 --import ShowOverride (showOverride)
 main :: Effect Unit
@@ -25,3 +26,5 @@ main = do
   existentialQualification1
   log "**** existential qualification 2"
   existentialQualification2
+  log "**** functor"
+  functor
