@@ -194,8 +194,7 @@ type Show'
 
 myShow :: Typeclass Show'
 myShow =
-  ShowMe
-    (const "Z")
+  ShowMe (const "Z")
     /\ (\px (ShowMe f) -> ShowMe (const $ "Succ (" <> (f px) <> ")"))
     @!> (ShowMe (\(_ :: Boolean) -> "Fooled you with a fake boolean!"))
     @> tnil
