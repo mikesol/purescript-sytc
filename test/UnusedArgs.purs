@@ -1,0 +1,1 @@
+module Test.UnusedArgs where

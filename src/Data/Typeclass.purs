@@ -24,6 +24,7 @@ module Data.Typeclass
   , class UnCons
   , class Union
   , union
+  , using'
   , consSingleton
   , consViaInduction
   , TNil
@@ -182,6 +183,9 @@ instance unionTypeclassCons' :: Union (TypeclassC' f a) b (TypeclassC' f o) => U
 
 using :: forall x f f' head tail row. Newtype (f x) f' => UnCons x f head tail (TypeclassC' f row) => Typeclass (TypeclassC' f row) -> f'
 using row = unwrap $ fst (uncons (Proxy :: Proxy x) row)
+
+using' :: forall x f head tail row. UnCons x f head tail (TypeclassC' f row) => Typeclass (TypeclassC' f row) -> f x
+using' row = fst (uncons (Proxy :: Proxy x) row)
 
 using_ :: forall x f f' head tail row. Newtype (f x) f' => UnCons x f head tail (TypeclassC' f row) => (Unit -> Typeclass (TypeclassC' f row) )-> f'
 using_ row = unwrap $ fst (uncons (Proxy :: Proxy x) (row unit))

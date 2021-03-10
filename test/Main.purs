@@ -5,6 +5,7 @@ import Basic (basic)
 import ConstraintPolymorphism (constraintPolymorphism)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import ExistentialQualification (existentialQualification)
 import Recursive1 (recursive1)
 import Recursive2 (recursive2)
 
@@ -19,3 +20,5 @@ main = do
   recursive2
   log "**** constraint polymorphism"
   constraintPolymorphism
+  log "**** existential qualification"
+  existentialQualification
