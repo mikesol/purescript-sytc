@@ -3,6 +3,7 @@ module Test.Main where
 import Prelude
 import Basic (basic)
 import ConstraintPolymorphism (constraintPolymorphism)
+import ConstraintPolymorphism2 (constraintPolymorphism2)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import ExistentialQualification1 (existentialQualification1)
@@ -22,6 +23,8 @@ main = do
   recursive2
   log "**** constraint polymorphism"
   constraintPolymorphism
+  log "**** constraint polymorphism 2"
+  constraintPolymorphism2
   log "**** existential qualification 1"
   existentialQualification1
   log "**** existential qualification 2"

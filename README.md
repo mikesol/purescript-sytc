@@ -71,6 +71,7 @@ boolShow = (ShowMe $ (show :: Boolean -> String)) @> tnil
 main :: Effect Unit
 main = do
   log $ using (intShow <@@> boolShow) true
+  log $ using (intShow <@@> boolShow) 5
   log $ using intShow 1
 ```
 

@@ -20,7 +20,8 @@ intShow = (ShowMe $ (show :: Int -> String)) @> tnil
 boolShow :: Showable Boolean
 boolShow = (ShowMe $ (show :: Boolean -> String)) @> tnil
 
-constraintPolymorphism :: Effect Unit
-constraintPolymorphism = do
+constraintPolymorphism2 :: Effect Unit
+constraintPolymorphism2 = do
   log $ using (intShow <@@> boolShow) true
+  log $ using (intShow <@@> boolShow) 5
   log $ using intShow 1
