@@ -43,14 +43,14 @@ type Person r = (FirstName + LastName + r)
 type SimplePerson = Record (Person + ())
 ```
 
-This library provides a set of tools for using typeclasses as one would use extensible records. In the example below, `intShow` is extended by `boolShow` just like, in the example above, `FirstName` is extended by `LastName`.
+This library provides a set of tools for using typeclasses as one would use extensible records. In the example below, `intShow` is composed with `boolShow` much like, in the example above, `FirstName` is composed with `LastName`.
 
 ```purescript
-module Example where
+module Main where
 
 import Prelude
 import Data.Newtype (class Newtype)
-import Data.Typeclass (using, Typeclass, type (@@), type (@>), TNil, (@>), tnil)
+import Data.Typeclass (using, Typeclass, type (@@), (<@@>), type (@>), TNil, (@>), tnil)
 import Effect (Effect)
 import Effect.Class.Console (log)
 
@@ -59,19 +59,19 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
-type Showable t a
-  = Typeclass (ShowMe @@ (t @> a))
+type Showable t
+  = Typeclass (ShowMe @@ (t @> TNil))
 
-intShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Int a
-intShow a = (ShowMe $ (show :: Int -> String)) @> a
+intShow :: Showable Int
+intShow = (ShowMe $ (show :: Int -> String)) @> tnil
 
-boolShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Boolean a
-boolShow a = (ShowMe $ (show :: Boolean -> String)) @> a
+boolShow :: Showable Boolean
+boolShow = (ShowMe $ (show :: Boolean -> String)) @> tnil
 
 main :: Effect Unit
 main = do
-  log $ using (intShow (boolShow tnil)) true
-  log $ using (intShow tnil) 1
+  log $ using (intShow <@@> boolShow) true
+  log $ using intShow 1
 ```
 
 It is similar in some ways to the [scrap your typeclass article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
