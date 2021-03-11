@@ -11,19 +11,16 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
-type BaseShow a
-  = ShowMe @@ (Int @> a)
+type Showable t a
+  = Typeclass (ShowMe @@ (t @> a))
 
-type MyShows a
-  = Typeclass (BaseShow a)
+intShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Int a
+intShow a = (ShowMe $ (show :: Int -> String)) @> a
 
-myShow :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
-myShow a = (ShowMe $ (show :: Int -> String)) @> a
-
-extension :: Typeclass (ShowMe @@ (Boolean @> TNil))
-extension = (ShowMe $ (show :: Boolean -> String)) @> tnil
+boolShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Boolean a
+boolShow a = (ShowMe $ (show :: Boolean -> String)) @> a
 
 constraintPolymorphism :: Effect Unit
 constraintPolymorphism = do
-  log $ using (myShow extension) true
-  log $ using (myShow tnil) 1
+  log $ using (intShow (boolShow tnil)) true
+  log $ using (intShow tnil) 1

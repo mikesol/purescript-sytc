@@ -31,14 +31,50 @@ prog = do
 
 # Scrap your type classes
 
-Type class instances can't be modified once they're created. That means that, once `Show Unit` has been defined, we need to define a new type class if we want to override `Show Unit`. In most cases this is fine, but in some cases it won't work:
+Type classes make a lot of sense when you're working on a library and you don't know who will be using it. In that case, they provide a global namespace so that, if you make an instance of `Show` and that instance gets imported (directly or transitively) into a project, the compiler will use it.
 
-1. We can't create [orphaned instances](https://github.com/purescript/documentation/blob/master/errors/OrphanInstance.md).
-1. We can't use information about type classes to determine the flow of a program. For example, we can't count how many instances they have, determine if they have instances of the same type, etc.
-1. We can't pass type classes as arguments to other type classes (also called constraint polymorphism). Meaning you can't do `class k a <= Foo k a` where `k` is a `Constraint` passed to `Foo`.
-1. We can't create a typeclass whose instance functions only use some of the arguments (ie if the class is `class Foo bar baz`, then both `bar` and `baz` must be used in all function definitions belonging to the class).
+On the other hand, when building applications, we often want composable segments that represent business logic. For example, if we have a complicated record with many fields, we'll usually split it up into smaller records. For example:
 
-This library provides a set of tools for working around those limitations. It is sort of like the [original sytc article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
+```purescript
+type FirstName r = (firstName :: String + r)
+type LastName r = (lastName :: String + r)
+type Person r = (FirstName + LastName + r)
+--- and later, on the application layer, we close the record
+type SimplePerson = Record (Person + ())
+```
+
+This library provides a set of tools for using typeclasses as one would use extensible records. In the example below, `intShow` is extended by `boolShow` just like, in the example above, `FirstName` is extended by `LastName`.
+
+```purescript
+module Example where
+
+import Prelude
+import Data.Newtype (class Newtype)
+import Data.Typeclass (using, Typeclass, type (@@), type (@>), TNil, (@>), tnil)
+import Effect (Effect)
+import Effect.Class.Console (log)
+
+newtype ShowMe a
+  = ShowMe (a -> String)
+
+derive instance newtypeShowMe :: Newtype (ShowMe a) _
+
+type Showable t a
+  = Typeclass (ShowMe @@ (t @> a))
+
+intShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Int a
+intShow a = (ShowMe $ (show :: Int -> String)) @> a
+
+boolShow :: forall a. Typeclass (ShowMe @@ a) -> Showable Boolean a
+boolShow a = (ShowMe $ (show :: Boolean -> String)) @> a
+
+main :: Effect Unit
+main = do
+  log $ using (intShow (boolShow tnil)) true
+  log $ using (intShow tnil) 1
+```
+
+It is similar in some ways to the [scrap your typeclass article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
 
 # API
 
@@ -117,42 +153,6 @@ true
 1
 Fooled you with a fake boolean!
 Fooled you with a fake integer!
-```
-
-# Constraint polymorphism
-
-This technique makes constraint polymorphism possible. In the example below, `MyShow` acts like a polymorphic constraint that is then extended by `extension`.
-
-```purescript
-module ConstraintPolymorphism where
-
-import Prelude
-import Data.Newtype (class Newtype)
-import Data.Typeclass (using, Typeclass, type (@@), type (@>), TNil, (@>), tnil)
-import Effect (Effect)
-import Effect.Class.Console (log)
-
-newtype ShowMe a
-  = ShowMe (a -> String)
-
-derive instance newtypeShowMe :: Newtype (ShowMe a) _
-
-type BaseShow a
-  = ShowMe @@ (Int @> a)
-
-type MyShows a
-  = Typeclass (BaseShow a)
-
-myShow :: forall a. Typeclass (ShowMe @@ a) -> MyShows a
-myShow a = (ShowMe $ (show :: Int -> String)) @> a
-
-extension :: Typeclass (ShowMe @@ (Boolean @> TNil))
-extension = (ShowMe $ (show :: Boolean -> String)) @> tnil
-
-constraintPolymorphism :: Effect Unit
-constraintPolymorphism = do
-  log $ using (myShow extension) true
-  log $ using (myShow tnil) 1
 ```
 
 # Induction
