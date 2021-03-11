@@ -11,14 +11,11 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
-type Identity x
-  = x -> x
-
-internal :: forall x. Identity x -> Effect Unit
+internal :: forall x. (x -> x) -> Effect Unit
 internal y = do
   let
     myShow =
-      ShowMe (\(i :: Identity x) -> "Hi identity!")
+      ShowMe (\(i :: x -> x) -> "Hi identity!")
         @> ShowMe (\i -> "Not " <> (show :: Boolean -> String) (not i))
         @> tnil
   log $ using myShow y
