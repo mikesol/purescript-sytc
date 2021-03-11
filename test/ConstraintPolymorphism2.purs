@@ -1,6 +1,7 @@
 module ConstraintPolymorphism2 where
 
 import Prelude
+import Control.Lazy (fix)
 import Data.Newtype (class Newtype)
 import Data.Typeclass (using, Typeclass, type (@@), (<@@>), type (@>), TNil, (@>), tnil)
 import Effect (Effect)
@@ -11,20 +12,21 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
+type Showable :: forall k. k -> Type
 type Showable t
   = Typeclass (ShowMe @@ (t @> TNil))
 
-showInt :: Int -> String
-showInt i
-  | i > 0 = "1 + " <> showInt (i-1)
-  | i < 0 = "-1 + " <> showInt (i+1)
-  | otherwise = "0"
+showable :: forall t. (t -> String) -> Showable t
+showable x = (ShowMe x) @> tnil
 
 intShow :: Showable Int
-intShow = (ShowMe $ showInt) @> tnil
+intShow = showable $ fix \f i ->
+  if i > 0 then "1 + " <> f (i - 1)
+  else if i < 0 then "-1 + " <> f (i + 1)
+  else "0"
 
 boolShow :: Showable Boolean
-boolShow = (ShowMe $ (if _ then "true" else "false")) @> tnil
+boolShow = showable $ if _ then "true" else "false"
 
 constraintPolymorphism2 :: Effect Unit
 constraintPolymorphism2 = do
