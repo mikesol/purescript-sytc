@@ -3,7 +3,7 @@ module Basic where
 import Prelude
 import Data.Newtype (class Newtype)
 import Data.Tuple.Nested ((/\))
-import Data.Typeclass (type (@>), type (@@), TNil, Typeclass, tnil, using, (<@@>), (@-), (@>))
+import Data.Typeclass (type (@>), type (@@), TNil, Typeclass, tnil, using, (<@@>), (-@-), (@>))
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Type.Proxy (Proxy(..))
@@ -31,18 +31,18 @@ yourShow =
 meanShow :: Typeclass Show'
 meanShow =
   let
-    _ /\ _ /\ t = (Proxy :: Proxy Int) @- myShow
+    _ /\ _ /\ t = (Proxy :: Proxy Int) -@- myShow
 
-    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- yourShow
+    _ /\ h /\ _ = (Proxy :: Proxy Boolean) -@- yourShow
   in
     h <@@> t
 
 niceShow :: Typeclass Show'
 niceShow =
   let
-    _ /\ _ /\ t = (Proxy :: Proxy Int) @- yourShow
+    _ /\ _ /\ t = (Proxy :: Proxy Int) -@- yourShow
 
-    _ /\ h /\ _ = (Proxy :: Proxy Boolean) @- myShow
+    _ /\ h /\ _ = (Proxy :: Proxy Boolean) -@- myShow
   in
     h <@@> t
 

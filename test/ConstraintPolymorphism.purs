@@ -1,8 +1,9 @@
 module ConstraintPolymorphism where
 
 import Prelude
+
 import Data.Newtype (class Newtype)
-import Data.Typeclass (using, Typeclass, type (@@), type (@>), TNil, (@>), tnil)
+import Data.Typeclass (type (@>), type (@@), Typeclass, TypeclassRow', tnil, using, (@>))
 import Effect (Effect)
 import Effect.Class.Console (log)
 
@@ -11,6 +12,7 @@ newtype ShowMe a
 
 derive instance newtypeShowMe :: Newtype (ShowMe a) _
 
+type Showable :: forall k. k -> TypeclassRow' -> Type
 type Showable t a
   = Typeclass (ShowMe @@ (t @> a))
 

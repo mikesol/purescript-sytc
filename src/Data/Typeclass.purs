@@ -16,10 +16,10 @@ module Data.Typeclass
   , TypeclassConsSingleton
   , TypeclassCons
   , class Inductor
-  , class NegCons
-  , class PosCons
-  , negCons
-  , posCons
+  , class HeadCons
+  , class TailCons
+  , headCons
+  , tailCons
   , induct
   , class UnCons
   , class Union
@@ -34,8 +34,10 @@ module Data.Typeclass
   , type (@>)
   , type (@!>)
   , (@>)
-  , (@-)
+  , (-@-)
   , (@!>)
+  , (-@)
+  , (@-)
   , (<@@>)
   , using
   , using_
@@ -99,57 +101,65 @@ instance inductS ::  Inductor func x start next => Inductor func (next x) start 
 else instance inductZ :: Inductor func start start next where
   induct _ = fst
 
-class NegCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
-class NegCons label func head row | label row -> func head where
-  negCons :: Proxy label -> Typeclass row -> func label /\ Typeclass head
+class HeadCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
+class HeadCons label func head row | label row -> func head where
+  headCons :: Proxy label -> Typeclass row -> func label /\ Typeclass head
 
-instance negConsCacheHitS :: NegCons l f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
-  negCons _ (Typeclass (a : b)) =
+class HeadConsChain :: forall (l :: Type). TypeclassRow' -> (l -> Type) -> Typeclass' -> Constraint
+class HeadConsChain labels func row
+
+
+instance headConsChainN :: HeadConsChain TypeclassNil' f row
+
+instance headConsChainC :: (HeadCons h f x row, HeadConsChain t f row) => HeadConsChain (TypeclassCons' h t) f row
+
+instance headConsCacheHitS :: HeadCons l f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
+  headCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (unsafeCoerce a') /\ Typeclass Nil
-  negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance negConsCacheHitG :: Inductor f (gen x) l gen  => NegCons (Proxy (gen x)) f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
-  negCons _ (Typeclass (a : b)) =
+  headCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance headConsCacheHitG :: Inductor f (gen x) l gen  => HeadCons (Proxy (gen x)) f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
+  headCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (((induct :: Proxy (gen x) -> f (Proxy l) /\ (forall y. Proxy y -> f (Proxy y) -> f (Proxy (gen y))) -> f (Proxy (gen x))) (Proxy :: Proxy (gen x)) (unsafeCoerce a'))) /\ Typeclass Nil
-  negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance negConsCacheHitZ :: Inductor f l l gen => NegCons (Proxy l) f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
-  negCons _ (Typeclass (a : b)) =
+  headCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance headConsCacheHitZ :: Inductor f l l gen => HeadCons (Proxy l) f (TypeclassC' f TypeclassNil') (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
+  headCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (((induct :: Proxy l -> f (Proxy l) /\ (forall y. Proxy y -> f (Proxy y) -> f (Proxy (gen y))) -> f (Proxy l)) (Proxy :: Proxy l) (unsafeCoerce a'))) /\ Typeclass Nil
-  negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance negConsCacheMiss :: NegCons l f (TypeclassC' f notC) (TypeclassC' f c) => NegCons l f (TypeclassC' f (TypeclassCons' x'x notC)) (TypeclassC' f (TypeclassCons' x'x c)) where
-  negCons l (Typeclass (a : b)) = let x /\ (Typeclass y) = (negCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass (TypeclassC' f notC)) l (Typeclass b) in x /\ (Typeclass (a : y))
-  negCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+  headCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance headConsCacheMiss :: HeadCons l f (TypeclassC' f notC) (TypeclassC' f c) => HeadCons l f (TypeclassC' f (TypeclassCons' x'x notC)) (TypeclassC' f (TypeclassCons' x'x c)) where
+  headCons l (Typeclass (a : b)) = let x /\ (Typeclass y) = (headCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass (TypeclassC' f notC)) l (Typeclass b) in x /\ (Typeclass (a : y))
+  headCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
 
-class PosCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
-class PosCons label func tail row | label row -> func tail where
-  posCons :: Proxy label -> Typeclass row -> func label /\ Typeclass tail
+class TailCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Constraint
+class TailCons label func tail row | label row -> func tail where
+  tailCons :: Proxy label -> Typeclass row -> func label /\ Typeclass tail
 
-instance posConsCacheHit :: PosCons l f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
-  posCons _ (Typeclass (a : b)) =
+instance tailConsCacheHit :: TailCons l f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassSingleton' l) c)) where
+  tailCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (unsafeCoerce a') /\ Typeclass b
-  posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance posConsCacheHitS :: Inductor f (gen x) l gen => PosCons (Proxy (gen x)) f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
-  posCons _ (Typeclass (a : b)) =
+  tailCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance tailConsCacheHitS :: Inductor f (gen x) l gen => TailCons (Proxy (gen x)) f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
+  tailCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (((induct :: Proxy (gen x) -> f (Proxy l) /\ (forall y. Proxy y -> f (Proxy y) -> f (Proxy (gen y))) -> f (Proxy (gen x))) (Proxy :: Proxy (gen x)) (unsafeCoerce a'))) /\ Typeclass b
-  posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance posConsCacheHitZ :: Inductor f l l gen => PosCons (Proxy l) f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
-  posCons _ (Typeclass (a : b)) =
+  tailCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance tailConsCacheHitZ :: Inductor f l l gen => TailCons (Proxy l) f (TypeclassC' f c) (TypeclassC' f (TypeclassCons' (TypeclassViaInduction' l gen) c)) where
+  tailCons _ (Typeclass (a : b)) =
     let (TypeclassType a') = unsafeCoerce a
     in
       (((induct :: Proxy l -> f (Proxy l) /\ (forall y. Proxy y -> f (Proxy y) -> f (Proxy (gen y))) -> f (Proxy l)) (Proxy :: Proxy l) (unsafeCoerce a'))) /\ Typeclass b
-  posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
-else instance posConsCacheMiss :: PosCons l f o (TypeclassC' f c) => PosCons l f o (TypeclassC' f (TypeclassCons' x'x c)) where
-  posCons l (Typeclass (a : b)) = (posCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass o) l (Typeclass b)
-  posCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+  tailCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
+else instance tailConsCacheMiss :: TailCons l f o (TypeclassC' f c) => TailCons l f o (TypeclassC' f (TypeclassCons' x'x c)) where
+  tailCons l (Typeclass (a : b)) = (tailCons :: Proxy l -> Typeclass (TypeclassC' f c) -> f l /\ Typeclass o) l (Typeclass b)
+  tailCons _ (Typeclass Nil) = unsafeCrashWith "you shouldn't be here"
 
 class Cons :: forall (l :: Type). TypeclassType' -> Typeclass' -> Typeclass' -> Constraint
 class Cons a tail row | a tail -> row where
@@ -164,11 +174,11 @@ class UnCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass'
 class UnCons label func head tail row | label row -> func head tail where
   uncons :: Proxy label -> Typeclass row -> func label /\ Typeclass head /\ Typeclass tail
 
-instance consTypeclassUnCons' :: (PosCons label func tail row, NegCons label func head row) => UnCons label func head tail row where
+instance consTypeclassUnCons' :: (TailCons label func tail row, HeadCons label func head row) => UnCons label func head tail row where
   uncons a b =
     let
-      f /\ h = negCons a b
-      _ /\ t = posCons a b
+      f /\ h = headCons a b
+      _ /\ t = tailCons a b
     in
       f /\ h /\ t
 
@@ -228,5 +238,7 @@ consViaInduction a b = (cons :: (TypeclassType (TypeclassViaInduction' start nex
 
 infixr 5 consSingleton as @>
 infixr 5 consViaInduction as @!>
-infixr 5 uncons as @-
+infixr 5 uncons as -@-
+infixr 5 headCons as -@
+infixr 5 tailCons as @-
 infixr 5 union as <@@>

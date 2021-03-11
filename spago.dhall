@@ -9,6 +9,7 @@ You can edit this file as you like.
   , "effect"
   , "ordered-collections"
   , "psci-support"
+  , "safe-coerce"
   , "transformers"
   ]
 , packages = ./packages.dhall
