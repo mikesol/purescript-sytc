@@ -25,6 +25,12 @@ intShow = showable $ fix \f i ->
   else if i < 0 then "-1 + " <> f (i + 1)
   else "0"
 
+intShowAlt :: Showable Int
+intShowAlt = showable $ fix \f i ->
+  if i > 0 then "one plus " <> f (i - 1)
+  else if i < 0 then "negative one plus " <> f (i + 1)
+  else "zero"
+
 boolShow :: Showable Boolean
 boolShow = showable $ if _ then "true" else "false"
 
@@ -32,4 +38,5 @@ constraintPolymorphism2 :: Effect Unit
 constraintPolymorphism2 = do
   log $ using (intShow <@@> boolShow) true
   log $ using (intShow <@@> boolShow) 5
+  log $ using (intShowAlt <@@> boolShow) 5
   log $ using intShow (-1)

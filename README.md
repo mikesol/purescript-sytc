@@ -73,6 +73,12 @@ intShow = showable $ fix \f i ->
   else if i < 0 then "-1 + " <> f (i + 1)
   else "0"
 
+intShowAlt :: Showable Int
+intShowAlt = showable $ fix \f i ->
+  if i > 0 then "one plus " <> f (i - 1)
+  else if i < 0 then "negative one plus " <> f (i + 1)
+  else "zero"
+
 boolShow :: Showable Boolean
 boolShow = showable $ if _ then "true" else "false"
 
@@ -80,7 +86,17 @@ main :: Effect Unit
 main = do
   log $ using (intShow <@@> boolShow) true
   log $ using (intShow <@@> boolShow) 5
+  log $ using (intShowAlt <@@> boolShow) 5
   log $ using intShow (-1)
+```
+
+This produces:
+
+```bash
+true
+1 + 1 + 1 + 1 + 1 + 0
+one plus one plus one plus one plus one plus zero
+-1 + 0
 ```
 
 It is similar in some ways to the [scrap your typeclass article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
