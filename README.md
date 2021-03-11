@@ -62,17 +62,23 @@ derive instance newtypeShowMe :: Newtype (ShowMe a) _
 type Showable t
   = Typeclass (ShowMe @@ (t @> TNil))
 
+showInt :: Int -> String
+showInt i
+  | i > 0 = "1 + " <> showInt (i-1)
+  | i < 0 = "-1 + " <> showInt (i+1)
+  | otherwise = "0"
+
 intShow :: Showable Int
-intShow = (ShowMe $ (show :: Int -> String)) @> tnil
+intShow = (ShowMe $ showInt) @> tnil
 
 boolShow :: Showable Boolean
-boolShow = (ShowMe $ (show :: Boolean -> String)) @> tnil
+boolShow = (ShowMe $ (if _ then "true" else "false")) @> tnil
 
 main :: Effect Unit
 main = do
   log $ using (intShow <@@> boolShow) true
   log $ using (intShow <@@> boolShow) 5
-  log $ using intShow 1
+  log $ using intShow (-1)
 ```
 
 It is similar in some ways to the [scrap your typeclass article from 2012](https://www.haskellforall.com/2012/05/scrap-your-type-classes.html) with the major caveat that it still allows for parametric polymorphism. I think this is a very useful feature that I'm not willing to scrap!
