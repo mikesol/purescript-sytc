@@ -5,7 +5,7 @@ module Data.Typeclass
   , cons
   , uncons
   , tnil
-  , TypeclassWithUnCons
+  , PolymorphicOperation
   , TypeclassType
   , TypeclassC'
   , TypeclassRow'
@@ -16,7 +16,6 @@ module Data.Typeclass
   , TypeclassViaInduction'
   , TypeclassConsSingleton
   , TypeclassCons
-  , class WithUnCons
   , class Inductor
   , class HeadCons
   , class TailCons
@@ -31,7 +30,6 @@ module Data.Typeclass
   , consSingleton
   , consViaInduction
   , TNil
-  , type (@?)
   , type (@@)
   , type (/@\)
   , type (@>)
@@ -173,15 +171,9 @@ instance consS :: Cons (TypeclassSingleton' label) (TypeclassC' func tail) (Type
 else instance consI :: Cons (TypeclassViaInduction' label gen)  (TypeclassC' func tail) (TypeclassC' func (TypeclassCons' (TypeclassViaInduction' label gen) tail)) where
   cons a (Typeclass t) = Typeclass ((unsafeCoerce a) : t)
 
-class WithUnCons :: forall (l :: Type). TypeclassRow' -> (l -> Type) ->  Typeclass' -> Constraint
-class WithUnCons labels func row | labels func -> row
+type PolymorphicOperation :: forall k. k -> (k -> Type) -> TypeclassRow' -> Type
+type PolymorphicOperation label func row = forall head tail. UnCons label func head tail (TypeclassC' func row) => Typeclass (TypeclassC' func row)
 
-instance withUnConsN :: WithUnCons TypeclassNil' x row
-instance withUnConsC :: (WithUnCons b x (TypeclassC' x r), UnCons a x h t (TypeclassC' x r)) => WithUnCons (TypeclassCons' a b) x (TypeclassC' x r)
-
-type TypeclassWithUnCons :: forall k. (k -> Type) -> TypeclassRow' -> Type
-type TypeclassWithUnCons func labels = forall row. WithUnCons labels func row => Typeclass row
-infixr 6 type TypeclassWithUnCons as @?
 
 class UnCons :: forall (l :: Type). l -> (l -> Type) -> Typeclass' -> Typeclass' -> Typeclass' -> Constraint
 class UnCons label func head tail row | label row -> func head tail where

@@ -8,6 +8,7 @@ import Effect (Effect)
 import Effect.Class.Console (log)
 import ExistentialQualification1 (existentialQualification1)
 import ExistentialQualification2 (existentialQualification2)
+import Polymorphism (polymorphism)
 import Recursive1 (recursive1)
 import Recursive2 (recursive2)
 import Test.Functor (functor)
@@ -31,3 +32,5 @@ main = do
   existentialQualification2
   log "**** functor"
   functor
+  log "**** polymorphism"
+  polymorphism
